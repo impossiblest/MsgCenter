@@ -18,7 +18,7 @@ public interface IMsgServer {
 	
 	/**
 	 * 设置每分钟处理消息数量,默认为30/min
-	 * @param m
+	 * @param sendNumPerMin
 	 */
-	public void setM(int m);
+	public void setSendNumPerMin(int sendNumPerMin);
 }

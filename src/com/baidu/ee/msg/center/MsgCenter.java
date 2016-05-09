@@ -7,18 +7,30 @@ import com.baidu.ee.msg.IMsg;
 import com.baidu.ee.msg.factory.ServerFactory;
 import com.baidu.ee.msg.server.IMsgServer;
 
+/**
+ *消息中心<br>
+ *根据消息类型,指派给相应的消息服务器Server<br>
+ *一边接收用户的消息,一边开启线程指派消息给相应的服务器处理<p>
+ * @author mozhuoda
+ *
+ */
 public class MsgCenter {
 	private static MsgCenter singleton = null;
 	private MsgCenter() {}
 	
 	private BlockingQueue<IMsg> queue = new LinkedBlockingQueue<IMsg>();
-	private Thread th = new Thread(new QueueThread());
+	private Thread th = new Thread(new MsgCenterThread());
 	{
 		//边存边取
 		//设置次线程比主线程优先级低
 		th.setPriority(Thread.MIN_PRIORITY);
 		th.start();
 	}
+	/**
+	 * 接收消息队列
+	 * @param msg
+	 * @throws InterruptedException
+	 */
 	public void send(IMsg msg) throws InterruptedException{
 		queue.put(msg);
 	}
@@ -36,18 +48,21 @@ public class MsgCenter {
 		}
 		return singleton;
 	}
-	
-	private class QueueThread implements Runnable{
+	/**
+	 * 内部类,处理消息调度
+	 * @author mozhuoda
+	 *
+	 */
+	private class MsgCenterThread implements Runnable{
 
 		@Override
 		public void run() {
-			while(!queue.isEmpty()){
+			while(true){
 				try {
-					Thread.sleep((long)Math.random()*1000);
+					Thread.sleep(200);//200ms处理调度时间
 					IMsg msg = queue.take();
 					dispatch(msg);//调度,指派给相应的消息Server
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -61,7 +76,7 @@ public class MsgCenter {
 		private void dispatch(IMsg msg) throws InterruptedException{
 			String name = msg.getClass().getSimpleName();
 			IMsgServer msgServer = ServerFactory.getInstance(name);
-			msgServer.setM(3);
+			msgServer.setSendNumPerMin(3);//设置每分钟M条处理量
 			msgServer.sendMsg(msg);		
 		}
 	}
