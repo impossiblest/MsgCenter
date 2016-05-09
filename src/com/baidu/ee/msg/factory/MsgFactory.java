@@ -26,7 +26,6 @@ public class MsgFactory {
 			Constructor<?> con = demo.getConstructor(paramTypes); //主要就是这句了
 			msg = (IMsg)con.newInstance(params);
 		} catch (Exception e) {
-//			e.printStackTrace();
 			msg = new HiMsg(vo);
 		}
 		return msg;

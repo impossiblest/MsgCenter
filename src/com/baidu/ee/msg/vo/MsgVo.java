@@ -1,7 +1,7 @@
 package com.baidu.ee.msg.vo;
 
 /**
- * 消息vo
+ * 消息vo,用来装载消息内容
  * @author Jord
  *
  */

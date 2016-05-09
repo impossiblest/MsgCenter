@@ -6,23 +6,24 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 
 import com.baidu.ee.msg.IMsg;
 /**
- * 消息服务器的抽象父类
+ * 消息服务器的抽象父类<br>
+ * <p>接收到<消息中心>调度后,<br>
+ * 一边存储指定类型的消息,根据服务器限流要求<br>
+ * 当满足要求时,以处理时间为2s/条,发送消息.
  * @author Jord
  *
  */
 public abstract class BaseMsgServer{
-	
+	//记录log
+	private Logger log = Logger.getLogger("Server");
 	/**
-	 * 每分钟发送最大消息次数,默认30
+	 * 每分钟发送最大消息次数,默认20
 	 */
-	private int sendNumPerMin = 30;
-	/**
-	 * 处理消息发送的线程
-	 */
-	protected Thread th ;
+	private int sendNumPerMin = 20;
 	/**
 	 * 接收消息队列
 	 */	
@@ -32,7 +33,7 @@ public abstract class BaseMsgServer{
 	/**
 	 * 时间间隔:1分钟=60000ms
 	 */
-	private static long ONE_MINUTE = 6000;
+	private static long ONE_MINUTE = 60000;
 
 	public abstract boolean sendMsg(IMsg msg) throws InterruptedException ;
 	
@@ -41,7 +42,6 @@ public abstract class BaseMsgServer{
 		Thread thread = threadMap.get(msgType);
 		if(thread==null){
 			thread = new Thread(new QueueThread(queue));
-			System.out.println(Thread.currentThread().getName()+",msg--"+msg.getMsgType()+",queueSize--"+queue.size());
 			threadMap.put(msgType,thread);
 			thread.setPriority(Thread.MIN_PRIORITY);
 			thread.start();
@@ -76,8 +76,7 @@ public abstract class BaseMsgServer{
 				try {
 					endTime= this.startTime+ONE_MINUTE;
 					while(checkSend(endTime,sendTimes)){
-//						Thread.sleep((long) (Math.random()*1000));
-						Thread.sleep(1000);//模拟发送消息所需时间
+						Thread.sleep(2000);//模拟发送消息所需时间
 						System.out.println("***************************************************************************");
 						System.out.println(Thread.currentThread().getName() + "准备发消息!");
 						IMsg msg = queue.take();
@@ -90,7 +89,7 @@ public abstract class BaseMsgServer{
 					}
 					
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					log.warning(e.getMessage());
 				}
 			}
 			
