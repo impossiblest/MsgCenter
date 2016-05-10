@@ -13,9 +13,8 @@ public class HiMsgServer extends BaseMsgServer implements IMsgServer {
 	public boolean sendMsg(IMsg msg) throws InterruptedException {
 		//1.入列
 		queue.put(msg);
-		//2.check
-		//3.出列--发消息
-		startThread(msg);
+		//2.启动线程,处理消息验证限流要求、发送操作
+		startThreadByMsgType(msg);
 		return true;
 	}
 

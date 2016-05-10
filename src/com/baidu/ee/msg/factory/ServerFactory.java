@@ -7,7 +7,8 @@ import com.baidu.ee.msg.server.EmailMsgServer;
 import com.baidu.ee.msg.server.IMsgServer;
 
 /**
- * 消息服务器简单工厂
+ * 消息服务器<br>
+ * 简单工厂,登记实现单例
  * @author Jord
  *
  */

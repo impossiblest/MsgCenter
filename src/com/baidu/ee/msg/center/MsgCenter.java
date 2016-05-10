@@ -2,6 +2,7 @@ package com.baidu.ee.msg.center;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 
 import com.baidu.ee.msg.IMsg;
 import com.baidu.ee.msg.factory.ServerFactory;
@@ -11,21 +12,28 @@ import com.baidu.ee.msg.server.IMsgServer;
  *消息中心<br>
  *根据消息类型,指派给相应的消息服务器Server<br>
  *一边接收用户的消息,一边开启线程指派消息给相应的服务器处理<p>
- * @author mozhuoda
+ * @author Jord
  *
  */
 public class MsgCenter {
+	
+	//记录log
+	private Logger log = Logger.getLogger("MsgCenter");
+	
+	private int sendNumPerMin = 20;
 	private static MsgCenter singleton = null;
 	private MsgCenter() {}
 	
 	private BlockingQueue<IMsg> queue = new LinkedBlockingQueue<IMsg>();
 	private Thread th = new Thread(new MsgCenterThread());
+	/********************************************************/
 	{
 		//边存边取
 		//设置次线程比主线程优先级低
 		th.setPriority(Thread.MIN_PRIORITY);
 		th.start();
 	}
+	/********************************************************/
 	/**
 	 * 接收消息队列
 	 * @param msg
@@ -33,6 +41,10 @@ public class MsgCenter {
 	 */
 	public void send(IMsg msg) throws InterruptedException{
 		queue.put(msg);
+	}
+	
+	public void setSendNumPerMin(int sendNumPerMin){
+		this.sendNumPerMin = sendNumPerMin;
 	}
 	/**
 	 * 单例
@@ -63,7 +75,7 @@ public class MsgCenter {
 					IMsg msg = queue.take();
 					dispatch(msg);//调度,指派给相应的消息Server
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					log.warning(e.getMessage());
 				}
 			}
 		}
@@ -76,7 +88,7 @@ public class MsgCenter {
 		private void dispatch(IMsg msg) throws InterruptedException{
 			String name = msg.getClass().getSimpleName();
 			IMsgServer msgServer = ServerFactory.getInstance(name);
-			msgServer.setSendNumPerMin(3);//设置每分钟M条处理量
+			msgServer.setSendNumPerMin(sendNumPerMin);//设置每分钟M条处理量
 			msgServer.sendMsg(msg);		
 		}
 	}

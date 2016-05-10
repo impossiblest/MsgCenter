@@ -8,7 +8,7 @@ import com.baidu.ee.msg.vo.MsgVo;
 
 /**
  * 消息简单工厂类<br>
- * 根据消息的类型,利用反射返回相应实例;
+ * 根据消息的类型,利用反射返回相应实例;<br>
  * 若产生异常则返回默认的Hi消息。
  * @author Jord
  *
@@ -26,7 +26,6 @@ public class MsgFactory {
 			Constructor<?> con = demo.getConstructor(paramTypes); //主要就是这句了
 			msg = (IMsg)con.newInstance(params);
 		} catch (Exception e) {
-//			e.printStackTrace();
 			msg = new HiMsg(vo);
 		}
 		return msg;
