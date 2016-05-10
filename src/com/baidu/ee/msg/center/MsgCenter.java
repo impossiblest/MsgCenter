@@ -12,7 +12,7 @@ import com.baidu.ee.msg.server.IMsgServer;
  *消息中心<br>
  *根据消息类型,指派给相应的消息服务器Server<br>
  *一边接收用户的消息,一边开启线程指派消息给相应的服务器处理<p>
- * @author mozhuoda
+ * @author Jord
  *
  */
 public class MsgCenter {

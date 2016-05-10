@@ -8,7 +8,7 @@ import com.baidu.ee.msg.vo.MsgVo;
 
 /**
  * 消息简单工厂类<br>
- * 根据消息的类型,利用反射返回相应实例;
+ * 根据消息的类型,利用反射返回相应实例;<br>
  * 若产生异常则返回默认的Hi消息。
  * @author Jord
  *

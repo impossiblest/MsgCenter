@@ -12,7 +12,7 @@ import com.baidu.ee.msg.IMsg;
 /**
  * 消息服务器的抽象父类<br>
  * <p>接收到<消息中心>调度后,<br>
- * 一边存储指定类型的消息,根据服务器限流要求<br>
+ * 一边存储指定类型的消息,一边根据服务器限流要求<br>
  * 当满足要求时,以处理时间为2s/条,发送消息.
  * @author Jord
  *
@@ -37,7 +37,11 @@ public abstract class BaseMsgServer{
 
 	public abstract boolean sendMsg(IMsg msg) throws InterruptedException ;
 	
-	protected void startThread(IMsg msg){
+	/**
+	 * 根据消息类型启动相应的线程
+	 * @param msg
+	 */
+	protected void startThreadByMsgType(IMsg msg){
 		String msgType = msg.getMsgType();
 		Thread thread = threadMap.get(msgType);
 		if(thread==null){
